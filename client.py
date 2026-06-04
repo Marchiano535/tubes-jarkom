@@ -12,11 +12,14 @@ import os
 #
 # Configuration
 #
-PROXY_HOST  = "127.0.0.1"
+# UNTUK 2 LAPTOP SETUP: Ubah PROXY_HOST dan SERVER_HOST ke IP Laptop A
+# Contoh: PROXY_HOST = "192.168.1.10"  (ganti dengan IP Laptop A)
+#
+PROXY_HOST  = "127.0.0.1"        # Ganti ke IP Laptop A jika 2 laptop
 PROXY_PORT  = 8080
-SERVER_HOST = "127.0.0.1"   # Langsung ke Web Server untuk UDP
+SERVER_HOST = "127.0.0.1"        # Ganti ke IP Laptop A jika 2 laptop (untuk UDP)
 UDP_PORT    = 9000
-UDP_TIMEOUT = 1.0            # 1 detik per paket
+UDP_TIMEOUT = 1.0                # 1 detik per paket
 DEFAULT_UDP_COUNT = 10
 DEFAULT_URL = "/index.html"
 
