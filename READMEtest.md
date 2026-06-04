@@ -1,5 +1,7 @@
-# Tubes Jaringan Komputer 
+# Tubes Jaringan Komputer – Modul 8
 ## Implementasi Client-Proxy-Server (Socket Python)
+
+Kelompok 2 orang. Proxy dan web server dijalankan di satu laptop yang sama.
 
 ## Struktur File
 
@@ -98,19 +100,24 @@ python client.py --mode udp --server-host 192.168.1.11
 
 ## Fitur yang Sudah Diimplementasikan
 
-- TCP HTTP Server (GET saja)
-- Error handling: 404, 500, 405
-- UDP Echo Server
-- Threading untuk concurrent connections
-- Proxy forwarding ke server
-- In-memory caching (thread-safe)
-- X-Cache header menunjukkan HIT/MISS
-- Client bisa kirim HTTP request via proxy
-- UDP QoS testing (pinger)
-- Hitung RTT, Jitter, Packet Loss
-- Throughput calculation
-- Mode multi-client (concurrent load)
-- Logging lengkap dengan timestamp
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| TCP HTTP Server | ✅ | GET, parsing header, response HTTP/1.1 |
+| Error 404 / 500 | ✅ | Penanganan file tidak ditemukan |
+| UDP Echo Server | ✅ | Echo payload tanpa modifikasi |
+| Konkurensi (threading) | ✅ | Thread per-connection (server & proxy) |
+| Proxy Forwarding | ✅ | Teruskan request client → server |
+| Proxy Caching | ✅ | In-memory, thread-safe, HIT/MISS |
+| Error 502 / 504 | ✅ | Bad Gateway, Gateway Timeout |
+| X-Cache Header | ✅ | HIT/MISS dikirim ke client |
+| Client HTTP TCP | ✅ | GET via Proxy, tampilkan HTML |
+| Client UDP QoS | ✅ | Kirim 10+ paket, hitung statistik |
+| Statistik RTT | ✅ | Min/Avg/Max RTT per paket |
+| Packet Loss (%) | ✅ | (lost/sent) × 100 |
+| Jitter | ✅ | σ(ΔRTTi) – std deviasi selisih RTT |
+| Throughput | ✅ | Total payload / durasi (kbps) |
+| Multi-client | ✅ | 5 thread konkuren via `--mode multi` |
+| Log lengkap | ✅ | Timestamp, IP, path, status, cache |
 
 ## Test Cases
 
@@ -142,25 +149,32 @@ python client.py --mode udp --server-host 192.168.1.11
 
 ## Troubleshooting
 
-- **Connection refused** → webserver atau proxy belum dijalankan. Cek urutan: webserver → proxy → client
-- **Timeout UDP** → firewall mungkin block UDP, atau server crash. Coba nonaktifkan firewall dulu
-- **Cache tidak bekerja** → proxy belum aktif. Pastikan proxy.py running
-- **HTML kosong/error** → parsing HTTP header salah. Cek format request harus `GET /path HTTP/1.1\r\n\r\n`
-- **Multi-client blocked** → thread tidak start dengan benar. Seharusnya sudah ditangani di code
+| Gejala | Penyebab | Solusi |
+|--🐛 ------|----------|--------|
+| `Connection refused` | Server/proxy belum jalan atau port salah | Jalankan urutan: webserver → proxy → client |
+| `Timeout UDP` | Firewall memblokir UDP / server crash | Nonaktifkan firewall; pastikan UDP server jalan di port 9000 |
+| Cache tidak berfungsi | Proxy belum jalan | Pastikan proxy.py aktif |
+| HTML kosong | Parsing HTTP header salah | Pastikan request format `GET /path HTTP/1.1\r\n\r\n` |
+| Multi-client blocking | join() dipanggil sebelum semua thread start | Sudah ditangani di client.py (start semua dulu, baru join) |
 
-## QoS Metrics
+---
 
-- **RTT** = T_recv − T_send
-- **Packet Loss** = (paket_hilang / total) × 100%
-- **Jitter** = standard deviation dari delta RTT
-- **Throughput** = total_bytes × 8 / durasi (bits per second)
+## Parameter QoS (Rumus)
+
+| Parameter | Rumus |
+|--📊 Parameter QoS
+| RTT | T_recv − T_send |
+| Packet Loss | (paket_hilang / total_dikirim) × 100% |
+| Jitter | σ(RTTi − RTTi-1) |
+| Throughput | total_payload_bytes × 8 / durasi_detik (bps) |
 
 ## Deliverables
 
-Kumpulkan screenshot untuk:
-- webserver.py log saat menerima request
-- proxy.py log menunjukkan cache HIT dan MISS
-- client.py mode tcp output (HTML render)
-- client.py mode udp output (QoS stats)
-- client.py mode multi dengan 5 clients
-- Wireshark packet capture filter: `tcp.port==8000 || tcp.port==8080 || udp.port==9000`
+- [ ] Screenshot log `webserver.py` saat menerima request
+- [ ] Screenshot log `proxy.py` menunjukkan Cache HIT dan MISS
+- [ ] Screenshot output `client.py --mode tcp` (render HTML)
+- [ ] Screenshot output `client.py --mode udp` (statistik QoS)
+- [ ] Screenshot `client.py --mode multi --clients 5` (5 instance)
+- [ ] Screenshot Wireshark: filter `tcp.port==8000 || tcp.port==8080 || udp.port==9000`
+
+---

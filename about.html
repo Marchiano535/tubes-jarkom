@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Tubes Jarkom – About</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    h1   { color: #8e44ad; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; }
+    th { background: #8e44ad; color: #fff; }
+    tr:nth-child(even) { background: #f9f9f9; }
+  </style>
+</head>
+<body>
+  <h1>Tentang Proyek</h1>
+  <table>
+    <tr><th>Komponen</th><th>File</th><th>Port</th><th>Protokol</th></tr>
+    <tr><td>Web Server</td><td>webserver.py</td><td>8000 (TCP), 9000 (UDP)</td><td>HTTP + UDP Echo</td></tr>
+    <tr><td>Proxy Server</td><td>proxy.py</td><td>8080</td><td>TCP</td></tr>
+    <tr><td>Client</td><td>client.py</td><td>ephemeral</td><td>TCP + UDP</td></tr>
+  </table>
+  <p><a href="/index.html">← Kembali ke Home</a></p>
+</body>
+</html>
