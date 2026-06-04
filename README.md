@@ -107,10 +107,11 @@ python client.py --mode udp --server-host 192.168.1.11
 - X-Cache header menunjukkan HIT/MISS
 - Client bisa kirim HTTP request via proxy
 - UDP QoS testing (pinger)
-- Hitung RTT, Jitter, Packet Loss
-- Throughput calculation
+- Hitung RTT, Jitter, Packet Loss, Throughput
 - Mode multi-client (concurrent load)
 - Logging lengkap dengan timestamp
+- **CSV export untuk hasil test** (TCP, UDP, Multi-client)
+- **File logging** untuk webserver dan proxy
 
 ## Test Cases
 
@@ -164,3 +165,14 @@ Kumpulkan screenshot untuk:
 - client.py mode udp output (QoS stats)
 - client.py mode multi dengan 5 clients
 - Wireshark packet capture filter: `tcp.port==8000 || tcp.port==8080 || udp.port==9000`
+
+## Output Files
+
+Setiap test akan menghasilkan file CSV dengan hasil:
+- **TCP Mode**: `tcp_results_YYYYMMDD_HHMMSS.csv` - Hasil request (status, cache, RTT, ukuran)
+- **UDP Mode**: `udp_results_YYYYMMDD_HHMMSS.csv` - Statistik QoS (RTT, jitter, packet loss, throughput)
+- **Multi-Client**: `multi_client_results_YYYYMMDD_HHMMSS.csv` - Hasil dari setiap client
+
+Log files (real-time):
+- **webserver.log** - Catatan semua request HTTP dan UDP echo
+- **proxy.log** - Catatan semua request proxy, cache HIT/MISS, error

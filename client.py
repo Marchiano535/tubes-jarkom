@@ -5,6 +5,8 @@ import sys
 import argparse
 import threading
 import math
+import csv
+import os
 
 
 #
@@ -25,6 +27,52 @@ DEFAULT_URL = "/index.html"
 def log(tag: str, message: str):
     ts = datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3]
     print(f"[{ts}] [{tag}] {message}", flush=True)
+
+
+#
+# CSV Export Functions
+#
+def export_tcp_csv(filename: str, requests: list):
+    """Export TCP test results to CSV."""
+    try:
+        with open(filename, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=["No", "Path", "Status", "Cache", "RTT_ms", "Size_B"])
+            writer.writeheader()
+            for i, req in enumerate(requests, 1):
+                writer.writerow({
+                    "No": i,
+                    "Path": req.get("path", ""),
+                    "Status": req.get("status", ""),
+                    "Cache": req.get("cache", ""),
+                    "RTT_ms": f"{req.get('rtt_ms', 0):.3f}" if req.get("rtt_ms") else "N/A",
+                    "Size_B": req.get("size", 0)
+                })
+        log("CSV", f"TCP results saved to {filename}")
+    except Exception as e:
+        log("CSV", f"Error saving TCP CSV: {e}")
+
+
+def export_udp_csv(filename: str, qos_stats: dict, packets: list):
+    """Export UDP QoS test results to CSV."""
+    try:
+        with open(filename, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=["Metric", "Value"])
+            writer.writeheader()
+            
+            # Summary statistics
+            writer.writerow({"Metric": "Sent", "Value": qos_stats["sent"]})
+            writer.writerow({"Metric": "Received", "Value": qos_stats["received"]})
+            writer.writerow({"Metric": "Lost", "Value": qos_stats["sent"] - qos_stats["received"]})
+            writer.writerow({"Metric": "Loss_Percent", "Value": f"{qos_stats['loss_pct']:.2f}%"})
+            writer.writerow({"Metric": "RTT_Min_ms", "Value": f"{qos_stats['rtt_min']:.3f}"})
+            writer.writerow({"Metric": "RTT_Avg_ms", "Value": f"{qos_stats['rtt_avg']:.3f}"})
+            writer.writerow({"Metric": "RTT_Max_ms", "Value": f"{qos_stats['rtt_max']:.3f}"})
+            writer.writerow({"Metric": "Jitter_ms", "Value": f"{qos_stats['jitter']:.3f}"})
+            writer.writerow({"Metric": "Throughput_kbps", "Value": f"{qos_stats['throughput_kbps']:.3f}"})
+            
+        log("CSV", f"UDP results saved to {filename}")
+    except Exception as e:
+        log("CSV", f"Error saving UDP CSV: {e}")
 
 
 #
@@ -101,9 +149,12 @@ def run_tcp_mode(url: str = DEFAULT_URL, count: int = 1):
     print(f"  Jumlah : {count} request")
     print("=" * 60)
 
+    results = []
     for i in range(1, count + 1):
         print(f"\n── Request #{i} ──────────────────────────────────")
         res = http_get(url)
+        results.append(res)
+        
         status_str = res["status"] if res["status"] else "???"
         cache_str  = f"[{res['cache']}]" if res["cache"] else ""
         rtt_str    = f"{res['rtt_ms']:.1f}ms" if res["rtt_ms"] else "N/A"
@@ -121,6 +172,11 @@ def run_tcp_mode(url: str = DEFAULT_URL, count: int = 1):
 
         if count > 1 and i < count:
             time.sleep(0.3)
+
+    # Export TCP results to CSV
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    csv_file = f"tcp_results_{timestamp}.csv"
+    export_tcp_csv(csv_file, results)
 
     print("\n[TCP] Selesai.\n")
 
@@ -202,11 +258,18 @@ def run_udp_mode(count: int = DEFAULT_UDP_COUNT, target_host: str = SERVER_HOST)
     print(f"  Durasi Sesi    : {duration_s:.2f} s")
     print("=" * 60 + "\n")
 
-    return {
+    qos_stats = {
         "sent": sent, "received": received, "loss_pct": loss_pct,
         "rtt_min": rtt_min, "rtt_avg": rtt_avg, "rtt_max": rtt_max,
         "jitter": jitter, "throughput_kbps": throughput
     }
+    
+    # Export UDP results to CSV
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    csv_file = f"udp_results_{timestamp}.csv"
+    export_udp_csv(csv_file, qos_stats, rtts)
+
+    return qos_stats
 
 
 #
@@ -269,6 +332,11 @@ def run_multi_client(url: str = DEFAULT_URL, num_clients: int = 5):
     misses= sum(1 for r in results if r and r["cache"] == "MISS")
     print(f"  Cache   : {hits} HIT, {misses} MISS")
     print("─" * 55 + "\n")
+    
+    # Export multi-client results to CSV
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    csv_file = f"multi_client_results_{timestamp}.csv"
+    export_tcp_csv(csv_file, results)
 
 
 #

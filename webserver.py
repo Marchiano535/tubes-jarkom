@@ -22,7 +22,15 @@ BACKLOG  = 10
 #
 def log(tag: str, message: str):
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-    print(f"[{ts}] [{tag}] {message}", flush=True)
+    log_line = f"[{ts}] [{tag}] {message}"
+    print(log_line, flush=True)
+    
+    # Also write to log file
+    try:
+        with open("webserver.log", "a", encoding="utf-8") as f:
+            f.write(log_line + "\n")
+    except:
+        pass
 
 
 #

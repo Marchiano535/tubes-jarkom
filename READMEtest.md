@@ -177,4 +177,15 @@ python client.py --mode udp --server-host 192.168.1.11
 - [ ] Screenshot `client.py --mode multi --clients 5` (5 instance)
 - [ ] Screenshot Wireshark: filter `tcp.port==8000 || tcp.port==8080 || udp.port==9000`
 
+## Output Files
+
+Setiap test akan menghasilkan file CSV dengan hasil:
+- **TCP Mode**: `tcp_results_YYYYMMDD_HHMMSS.csv` - Hasil request (status, cache, RTT, ukuran)
+- **UDP Mode**: `udp_results_YYYYMMDD_HHMMSS.csv` - Statistik QoS (RTT, jitter, packet loss, throughput)
+- **Multi-Client**: `multi_client_results_YYYYMMDD_HHMMSS.csv` - Hasil dari setiap client
+
+Log files (real-time):
+- **webserver.log** - Catatan semua request HTTP dan UDP echo
+- **proxy.log** - Catatan semua request proxy, cache HIT/MISS, error
+
 ---
