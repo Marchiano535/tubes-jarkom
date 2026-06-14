@@ -13,8 +13,6 @@
 └── README.md      ← Panduan
 ```
 
-Perhatian: Tidak boleh ada file Python tambahan. Semua kode ada di 3 file di atas.
-
 ## Cara Menjalankan - Setup 2 Laptop
 
 **Laptop A (Proxy + Web Server):**
